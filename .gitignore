@@ -1,0 +1,8 @@
+syntax: glob
+.python-version
+.venv
+env/*
+venv/*
+ENV/*
+.idea/*
+.DS_Store
