@@ -42,7 +42,7 @@ class Model:
 
     def set_duplication_policy(self, duplication_policy):
         dp = duplication_policy.lower()
-        if dp == 'ignore' or dp == 'kill' or dp == 'replace'
+        if dp == 'ignore' or dp == 'kill' or dp == 'replace':
             self._duplication_policy = dp
             self._duplication_replace_attempts = self._default_duplication_replace_attempts
         elif dp.startswith('replace:'):
@@ -67,7 +67,7 @@ class Model:
             self._mutations_odds = mutation_odds
 
     def set_generations(self, generations):
-        if generations > 0 and generations.is_integer():
+        if generations > 0:
             self._generations = generations
         else:
             raise ValueError("Generations number must be a non-negative integer")
@@ -88,12 +88,12 @@ class Model:
     def get_generations(self): return self._generations
     def get_seed(self): return self._seed
     def get_elements(self): return self._elements
-    def get_population(self): return list(map(lambda el: el.get_genes, self._elements))
+    def get_population(self): return list(map(lambda el: el.get_genes(), self._elements))
     def get_offspring_function(self): return self._offspring_function
     def get_end_reason(self): return self._end_reason
     def get_current_generation(self): return self._current_generation
     def get_duplication_policy(self):
-        if (self._duplication_policy == 'replace'):
+        if self._duplication_policy == 'replace':
             return 'replace:{}'.format(self._duplication_replace_attempts)
         else:
             return self._duplication_policy
@@ -109,12 +109,12 @@ class Model:
         prob_sum = 0.0
         selected = None
         for element in self._elements:
-           if ignore_this_element is None or ignore_this_element != element:
-               p = element.get_probability()
-               if prob_sum + p >= r:
-                   selected = element
-               else:
-                   prob_sum += p
+            if ignore_this_element is None or ignore_this_element != element:
+                p = element.get_probability()
+                if prob_sum + p >= r:
+                    selected = element
+                else:
+                    prob_sum += p
         if selected is None:
             selected = self._elements[-1]
         return selected
@@ -160,3 +160,30 @@ class Model:
         return elements
 
     def evolve(self):
+        self._end_reason = self._default_end_reason
+        for g in range(0,self._generations+1):
+            self._current_generation = g
+            if g > 0:
+                el_num = len(self._elements)
+                self._kill_misfits()
+                if len(self._elements) < 2:
+                    self._end_reason = (2, 'Population perished')
+                    break
+                elitism_num = round(self._elitism_ratio * el_num)
+                elitists = self._elements[0:elitism_num]
+                remaining_couples_num = math.floor((el_num-elitism_num)/2)
+                self._elements = elitists + self._breed(remaining_couples_num)
+                self._handle_duplicates()
+                for el in self._elements:
+                    el.mutate(self._mutations_odds,self._all_values)
+            for el in self._elements:
+                el.set_strength(self._strength_function)
+            total_strength = sum([el.get_strength() for el in self._elements])
+            for el in self._elements:
+                el.strength_to_probability(total_strength)
+            self._elements.sort(reverse=True)
+            if any(math.isinf(el.get_strength()) for el in self._elements):
+                self._end_reason = (1, 'Ideal solution found')
+                break
+        if self._end_reason == self._default_end_reason:
+            self._end_reason = (0, 'Evolution completed')

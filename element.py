@@ -15,10 +15,10 @@ class Element:
     def get_probability(self): return self._probability
     def get_genes(self): return self._genes
 
-    def set_genes(self, genes): _genes = genes
+    def set_genes(self, genes): self._genes = genes
 
-    def set_strength(self, strengthFunction):
-        s = strengthFunction(self._genes)
+    def set_strength(self, strength_function):
+        s = strength_function(self._genes)
         if s < 0.0:
             raise ValueError("Strength must be non-negative")
         else:
@@ -55,7 +55,7 @@ class Element:
                     b = flip_bit_char(b)
                 mutated_bits += b
             new_index = binary_string_to_int(mutated_bits) % len(values)
-            new_genes.append(values(new_index))
+            new_genes.append(values[new_index])
         self.set_genes(new_genes)
 
 
@@ -66,10 +66,10 @@ class Element:
         return self.__hash__() == hash(other)
 
     def __lt__(self, other):
-        return self.__hash__() < hash(other)
+        return self._strength < other.get_strength()
 
     def __le__(self, other):
-        return self.__hash__() <= hash(other)
+        return self._strength <= other.get_strength()
 
     def __ne__(self, other):
         return not self.__eq__(other)

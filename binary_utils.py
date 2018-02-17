@@ -26,7 +26,7 @@ def flip_bit_char(bit):
 
 
 def seq_to_binary_string(sq, values):
-    binarys = map(lambda x: int_to_binary_string(sq.index(x)), sq)
+    binarys = map(lambda x: int_to_binary_string(values.index(x)), sq)
     binary_length = get_single_gene_bits_num(values)
     padded = list(map(lambda x: pad_binary_string(x,binary_length),binarys))
     return ''.join(padded)
@@ -35,4 +35,4 @@ def seq_to_binary_string(sq, values):
 def binary_string_to_seq(binary_string, values):
     gene_size = get_single_gene_bits_num(values)
     binary_genes = [binary_string[i:i+gene_size] for i in range(0,len(binary_string),gene_size)]
-    return list(map(lambda x: binary_string_to_int(x), binary_genes))
+    return list(map(lambda x: values[binary_string_to_int(x) % len(values)], binary_genes))
