@@ -54,8 +54,7 @@ class Element:
                 if r <= mutation_odds:
                     b = flip_bit_char(b)
                 mutated_bits += b
-            new_index = binary_string_to_int(mutated_bits) % len(values)
-            new_genes.append(values[new_index])
+            new_genes.append(get_value_of_binary_string(mutated_bits, values))
         self.set_genes(new_genes)
 
 

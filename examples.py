@@ -8,6 +8,7 @@ from model import Model
 from functools import partial
 from pyparsing import (Literal, CaselessLiteral, Word, Combine, Group, Optional, ZeroOrMore, Forward, nums, alphas, oneOf)
 
+
 class NumericStringParser:
     __author__ = 'Paul McGuire'
     __version__ = '$Revision: 0.0 $'
@@ -16,7 +17,7 @@ class NumericStringParser:
     http://pyparsing.wikispaces.com/message/view/home/15549426
     '''
     __note__ = '''
-    Taken from https://stackoverflow.com/a/2371789/5863503
+    Original code taken from https://stackoverflow.com/a/2371789/5863503 on 18/02/2018
     '''
 
     def pushFirst(self, strg, loc, toks):
@@ -27,16 +28,6 @@ class NumericStringParser:
             self.exprStack.append('unary -')
 
     def __init__(self):
-        """
-        expop   :: '^'
-        multop  :: '*' | '/'
-        addop   :: '+' | '-'
-        integer :: ['+' | '-'] '0'..'9'+
-        atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'
-        factor  :: atom [ expop factor ]*
-        term    :: factor [ multop factor ]*
-        expr    :: term [ addop term ]*
-        """
         point = Literal(".")
         e = CaselessLiteral("E")
         fnumber = Combine(Word("+-" + nums, nums) +
@@ -58,9 +49,6 @@ class NumericStringParser:
                  (ident + lpar + expr + rpar | pi | e | fnumber).setParseAction(self.pushFirst))
                 | Optional(oneOf("- +")) + Group(lpar + expr + rpar)
                 ).setParseAction(self.pushUMinus)
-        # by defining exponentiation as "atom [ ^ factor ]..." instead of
-        # "atom [ ^ atom ]...", we get right-to-left exponents, instead of left-to-right
-        # that is, 2^3^2 = 2^(3^2), not (2^3)^2.
         factor = Forward()
         factor << atom + \
             ZeroOrMore((expop + factor).setParseAction(self.pushFirst))
@@ -68,12 +56,7 @@ class NumericStringParser:
             ZeroOrMore((multop + factor).setParseAction(self.pushFirst))
         expr << term + \
             ZeroOrMore((addop + term).setParseAction(self.pushFirst))
-        # addop_term = ( addop + term ).setParseAction( self.pushFirst )
-        # general_term = term + ZeroOrMore( addop_term ) | OneOrMore( addop_term)
-        # expr <<  general_term
         self.bnf = expr
-        # map operator symbols to corresponding arithmetic operations
-        epsilon = 1e-12
         self.opn = {"+": operator.add,
                     "-": operator.sub,
                     "*": operator.mul,
@@ -144,7 +127,8 @@ def reach_42():
     print('Reach 42 - Starting population:\n----------------------------------')
     for subject in population:
         print(' '.join(subject), " = ", calc(subject,calculator))
-    model = Model(population,all_values,strength_func(calculator),offspring_functions.slice_and_stitch_func(all_values),seed=seed)
+    model = Model(population,all_values,strength_func(calculator),offspring_functions.slice_and_stitch_func(all_values),
+                  seed=seed)
     model.evolve()
 
     print('----------------------------------')
