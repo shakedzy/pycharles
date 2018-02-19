@@ -2,12 +2,10 @@ from __future__ import division
 import math
 import operator
 import random
-import time
 import offspring_functions
 from model import Model
 from functools import partial
 from pyparsing import (Literal, CaselessLiteral, Word, Combine, Group, Optional, ZeroOrMore, Forward, nums, alphas, oneOf)
-
 
 class NumericStringParser:
     __author__ = 'Paul McGuire'
@@ -91,6 +89,8 @@ class NumericStringParser:
 
 
 def reach_42():
+    calculator = NumericStringParser()
+
     def strength(subject, calculator):
         try:
             result = calculator.eval(''.join(subject))
@@ -110,10 +110,48 @@ def reach_42():
         except:
             return "NaN"
 
+    def run_model(population, all_values, seed):
+        print('Starting population:\n----------------------------------')
+        for subject in population:
+            print(' '.join(subject), " = ", calc(subject, calculator))
+        model = Model(population, all_values, strength_func(calculator),
+                      offspring_functions.slice_and_stitch_func(all_values),
+                      generations=15, seed=seed)
+        model.evolve()
+        print('----------------------------------')
+        print('Evolution end cause: {0} [Reason ID: {1}]'.format(model.get_end_reason()[1], model.get_end_reason()[0]))
+        print('Iterations required:', model.get_current_generation())
+        print("Model's best result: {0}  =  {1}\n".format(' '.join(model.get_best()), calc(model.get_best(), calculator)))
+
+    print('** REACH 42 **')
+
+    # values are a list
     seed = 1518883307
     random.seed(seed)
-    calculator = NumericStringParser()
     all_values = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+", "-", "*", "/"]
+    population = list()
+    for _ in range(0, 30):
+        subject = list()
+        for i in range(0, 7):
+            if i % 2 == 0:
+                r = random.randint(0, 9)
+            else:
+                r = random.randint(10, 13)
+            subject.append(all_values[r])
+        population.append(subject)
+    print('>> Values are a list')
+    run_model(population,all_values,seed)
+
+    # values are a dict
+    seed = 1519080224
+    random.seed(seed)
+    all_values = {0: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                  2: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                  4: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                  6: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                  1: [ "+", "-", "*", "/"],
+                  3: [ "+", "-", "*", "/"],
+                  5: [ "+", "-", "*", "/"]}
     population = list()
     for _ in range(0,30):
         subject = list()
@@ -121,20 +159,11 @@ def reach_42():
             if i%2 == 0:
                 r = random.randint(0,9)
             else:
-                r = random.randint(10,13)
-            subject.append(all_values[r])
+                r = random.randint(0,3)
+            subject.append(all_values[i][r])
         population.append(subject)
-    print('Reach 42 - Starting population:\n----------------------------------')
-    for subject in population:
-        print(' '.join(subject), " = ", calc(subject,calculator))
-    model = Model(population,all_values,strength_func(calculator),offspring_functions.slice_and_stitch_func(all_values),
-                  seed=seed)
-    model.evolve()
-
-    print('----------------------------------')
-    print('Evolution end cause: {0} [Reason ID: {1}]'.format(model.get_end_reason()[1],model.get_end_reason()[0]))
-    print('Iterations required:', model.get_current_generation())
-    print("Model's best result: {0}  =  {1}".format(' '.join(model.get_best()),calc(model.get_best(),calculator)))
+    print('>> Values are a dict')
+    run_model(population,all_values,seed)
 
 
 reach_42()

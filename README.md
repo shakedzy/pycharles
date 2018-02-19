@@ -22,7 +22,10 @@ solution = model.get_best()
 Basic parameters:
 * `population`: The population which needs to evolve. Each subject (or element) in the
  population is represented as a sequence of values
-* `all_values`: A sequence of all the possible values (genes) allowed in each subject of the population
+* `all_values`: All the possible values (genes) allowed in each subject of the population. This can either
+be a `list`, in which case all values are drawn from the same pool, or a `dict`, where the keys are integers
+representing the indices of the values of the subject, and the values are `list`s representing the unique 
+pools for each index.
 * `strength_function`: A function that accepts a subject of the population and determines 
  its strength, in the range of [0, inf], the higher the strength is, the closer the subject is to the 
  desired state
@@ -51,6 +54,9 @@ Each subject in the population is a mathematical equation, made of four integers
 operators from `[+,-,*,/]`. Each subject is represented as sequence of single-character strings of either
 a digit or an operator. The model's objective is to find a set of digits and characters which will
 yield 42. The Strength Function is defined as the absolute value of the result of 1/(x-42).
+
+### TO DO:
+* Code documentation
 
 ### License:
 Apache License 2.0

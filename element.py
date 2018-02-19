@@ -43,10 +43,14 @@ class Element:
                     self._probability = p
 
     def mutate(self, mutation_odds, values):
-        gene_size = get_single_gene_bits_num(values)
         new_genes = list()
-        for g in self._genes:
-            bits = int_to_binary_string(values.index(g))
+        for i,g in enumerate(self._genes):
+            if isinstance(values, dict):
+                gene = values[i].index(g)
+            else:
+                gene = values.index(g)
+            bits = int_to_binary_string(gene)
+            gene_size = get_single_gene_bits_num(values,i)
             padded_bits = pad_binary_string(bits,gene_size)
             mutated_bits = ''
             for b in padded_bits:
@@ -54,9 +58,8 @@ class Element:
                 if r <= mutation_odds:
                     b = flip_bit_char(b)
                 mutated_bits += b
-            new_genes.append(get_value_of_binary_string(mutated_bits, values))
+            new_genes.append(get_value_of_binary_string(mutated_bits, values, i))
         self.set_genes(new_genes)
-
 
     def __hash__(self):
         return hash(''.join(self._genes))

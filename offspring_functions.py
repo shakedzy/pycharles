@@ -4,11 +4,10 @@ from binary_utils import *
 
 
 def slice_and_stitch(subject1, subject2, values):
-    single_gene_bits_num = get_single_gene_bits_num(values)
-    max_length = len(values)*single_gene_bits_num
-    r = random.randint(0,max_length)
     bits1 = seq_to_binary_string(subject1, values)
     bits2 = seq_to_binary_string(subject2, values)
+    max_length = len(bits1)
+    r = random.randint(0, max_length)
     new_bits1 = bits1[0:r] + bits2[r:max_length]
     new_bits2 = bits2[0:r] + bits1[r:max_length]
     return binary_string_to_seq(new_bits1,values), binary_string_to_seq(new_bits2,values)
