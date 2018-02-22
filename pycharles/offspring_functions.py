@@ -1,6 +1,6 @@
 import random
 from functools import partial
-from binary_utils import *
+from pycharles.binary_utils import *
 
 
 def slice_and_stitch(subject1, subject2, values):

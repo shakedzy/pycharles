@@ -11,10 +11,18 @@ _Charles Darwin, 1809-1882_
 * [Genetic Algorithms on Wikipedia](https://en.wikipedia.org/wiki/Genetic_algorithm)
 * This [blog post](https://burakkanber.com/blog/machine-learning-genetic-algorithms-part-1-javascript/) with a simple tutorial and an example
 
+## Installation:
+Clone this repository to your local machine anr run `pip`:
+```
+git clone https://github.com/shakedzy/pycharles.git
+cd pycharles
+pip install .
+```
+
 ## Usage:
 Quick start:
 ```
-from model import Model
+from pycharles import Model
 model = Model(population, all_values, strength_function, offspring_function)
 model.evolve()
 solution = model.get_best()
@@ -30,7 +38,8 @@ pools for each index.
  its strength, in the range of [0, inf], the higher the strength is, the closer the subject is to the 
  desired state
 * `offspring_function`: A function that accepts two subjects (parents) 
- and outputs two subjects (offspring). The `offspring_functions` module holds some that can be used
+ and outputs two subjects (offspring). The `offspring_functions` module holds some that can be used 
+ (use `from pycharles import offspring_functions`)
 
 More configurations:
 * `elitism_ratio`: Must be in the range of [0,1]. Determines the percentage of elitists in each 

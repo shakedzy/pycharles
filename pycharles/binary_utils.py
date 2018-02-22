@@ -53,9 +53,7 @@ def binary_string_to_seq(binary_string, values):
     if isinstance(values, dict):
         sq = list()
         starting_point = 0
-        positions = list(values.keys())
-        positions.sort()
-        for position in positions:
+        for position in range(0,len(values)):
             gene_size = get_single_gene_bits_num(values[position])
             binary_gene = binary_string[starting_point:starting_point+gene_size]
             sq.append(get_value_of_binary_string(binary_gene,values[position]))

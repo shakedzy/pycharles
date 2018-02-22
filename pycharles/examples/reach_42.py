@@ -2,11 +2,13 @@ from __future__ import division
 import math
 import operator
 import random
-import offspring_functions
-from model import Model
+from pycharles import offspring_functions
+from pycharles.model import Model
 from functools import partial
 from pyparsing import (Literal, CaselessLiteral, Word, Combine, Group, Optional, ZeroOrMore, Forward, nums, alphas, oneOf)
 
+
+# Original class-code taken from: https://stackoverflow.com/a/2371789/5863503
 class NumericStringParser:
     __author__ = 'Paul McGuire'
     __version__ = '$Revision: 0.0 $'
@@ -15,7 +17,8 @@ class NumericStringParser:
     http://pyparsing.wikispaces.com/message/view/home/15549426
     '''
     __note__ = '''
-    Original code taken from https://stackoverflow.com/a/2371789/5863503 on 18/02/2018
+    All I've done is rewrap Paul McGuire's fourFn.py as a class, so I can use it
+    more easily in other places.
     '''
 
     def pushFirst(self, strg, loc, toks):
@@ -164,7 +167,3 @@ def reach_42():
         population.append(subject)
     print('>> Values are a dict')
     run_model(population,all_values,seed)
-
-
-reach_42()
-

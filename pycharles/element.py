@@ -1,6 +1,6 @@
 import math
 import random
-from binary_utils import *
+from pycharles.binary_utils import *
 
 
 class Element:

@@ -1,8 +1,8 @@
 import time
 import math
 import random
-import random_util
-from element import Element
+from pycharles import random_util
+from pycharles.element import Element
 
 
 class Model:
