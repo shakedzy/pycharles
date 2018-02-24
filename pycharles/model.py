@@ -22,10 +22,11 @@ class Model:
     _end_reason = _default_end_reason
     _current_generation = 0
     _duplication_replace_attempts = _default_duplication_replace_attempts
+    _verbose = False
 
     def __init__(self, population, all_values, strength_function, offspring_function,
                  elitism_ratio=0.1, mutation_odds=0.001, generations=10,
-                 duplication_policy='ignore', seed=int(time.time())):
+                 duplication_policy='ignore', seed=int(time.time()), verbose=False):
         self._all_values = all_values
         self._initial_population = population
         self.set_strength_function(strength_function)
@@ -35,10 +36,12 @@ class Model:
         self.set_generations(generations)
         self.set_duplication_policy(duplication_policy)
         self.set_seed(seed)
+        self.set_verbosity(verbose)
         self._set_population(population)
 
     def set_strength_function(self, strength_function): self._strength_function = strength_function
     def set_offspring_function(self, offspring_function): self._offspring_function = offspring_function
+    def set_verbosity(self, verbose): self._verbose = verbose
 
     def set_duplication_policy(self, duplication_policy):
         dp = duplication_policy.lower()
@@ -99,6 +102,10 @@ class Model:
             return self._duplication_policy
 
     def _kill_misfits(self): self._elements = [el for el in self._elements if el.get_strength() > 0.0]
+
+    def _print(self, text):
+        if self._verbose:
+            print(text)
 
     def _select_element(self, ignore_this_element=None):
         if ignore_this_element is None:
@@ -162,6 +169,7 @@ class Model:
     def evolve(self):
         self._end_reason = self._default_end_reason
         for g in range(0,self._generations+1):
+            self._print('Evolving - current generation: {0}, population size: {1}'.format(g,len(self._elements)))
             self._current_generation = g
             if g > 0:
                 el_num = len(self._elements)
@@ -187,3 +195,5 @@ class Model:
                 break
         if self._end_reason == self._default_end_reason:
             self._end_reason = (0, 'Evolution completed')
+        self._print('Evolution stopped: cause: {0} [reason ID: {1}]'
+                    .format(self.get_end_reason()[1],self.get_end_reason()[0]))

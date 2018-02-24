@@ -119,11 +119,10 @@ def reach_42():
             print(' '.join(subject), " = ", calc(subject, calculator))
         model = Model(population, all_values, strength_func(calculator),
                       offspring_functions.slice_and_stitch_func(all_values),
-                      generations=15, seed=seed)
+                      generations=15, seed=seed, verbose=True)
+        print('----------------------------------')
         model.evolve()
         print('----------------------------------')
-        print('Evolution end cause: {0} [Reason ID: {1}]'.format(model.get_end_reason()[1], model.get_end_reason()[0]))
-        print('Iterations required:', model.get_current_generation())
         print("Model's best result: {0}  =  {1}\n".format(' '.join(model.get_best()), calc(model.get_best(), calculator)))
 
     print('** REACH 42 **')

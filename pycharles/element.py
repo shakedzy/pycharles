@@ -62,7 +62,7 @@ class Element:
         self.set_genes(new_genes)
 
     def __hash__(self):
-        return hash(''.join(self._genes))
+        return hash(''.join(map(lambda x: str(x), self._genes)))
 
     def __eq__(self, other):
         return self.__hash__() == hash(other)
