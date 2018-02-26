@@ -128,7 +128,7 @@ def reach_42():
     print('** REACH 42 **')
 
     # values are a list
-    seed = 1518883307
+    seed = 1519568369
     random.seed(seed)
     all_values = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+", "-", "*", "/"]
     population = list()
@@ -145,7 +145,7 @@ def reach_42():
     run_model(population,all_values,seed)
 
     # values are a dict
-    seed = 1519080224
+    seed = 1519568341
     random.seed(seed)
     all_values = {0: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
                   2: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],

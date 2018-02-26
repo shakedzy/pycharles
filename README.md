@@ -44,16 +44,27 @@ pools for each index.
 More configurations:
 * `elitism_ratio`: Must be in the range of [0,1]. Determines the percentage of elitists in each 
  iteration. Elitists are the strongest subject in their generation, and therefore survive and advance 
- untouched to the next generation (mutation can still apply). Default value: 0.1
+ untouched to the next generation. Default value: 0.1
 * `mutations_odds`: Must be in the range of [0,1]. Determines the probability for mutation of 
  the subjects in each generation. A mutation is a single binary bit in the subject's genes being randomly
- flipped. Default value: 0.001
+ flipped. Default value: 0.001 
 * `generations`: Must be a positive integer. The number of iterations the model should run through
  before stopping. Default value: 10
-* `duplication_policy`: The policy of the model regarding duplicates in the population. See
- the class's documentation for more info. 
-* `seed` = A seed to be supplied to the model's pseudo-random number generator. Default value:
+* `early_stop`: Must be a positive integer or None (0 is the same as None). When not None, The model
+ will stop if a better solution was not found after the amount of generations specified. Default: None
+* `duplication_policy`: The policy of the model regarding duplicates in the population at the end of 
+ each generation. Options are: (1) `ignore`, ignore the duplications, (2) `kill`, leave only one copy of
+ each duplicated value. This shrinks the size of the population, (3) `replace`, similar to `kill`, only
+ the model will let the population breed again in order to fill the missing values. If any duplications occur
+ after this process, the model will repeat this process until all values are unique or up to 3 attempts, after
+ which the model will ignore duplications and proceed. To change the maximum attempts the model will make to
+ replace duplications, use `replace:X`, where `X` is the desired number. Default: `ignore` 
+* `mutate_elitists`: Boolean. Set if elitists can mutate when transferring from one generation to
+ the next one. When False, this ensures that the top solutions will be remain unchanged. When True, this
+  allows the model to explore more solutions. Default: False
+* `seed`: A seed to be supplied to the model's pseudo-random number generator. Default value:
  system time (`int(time.time())`)
+* `verbose`: Boolean. Set verbosity level. Default: False
  
 ## Examples:
 Examples are found in the project's test directory, in the `examples` module.

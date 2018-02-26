@@ -23,10 +23,13 @@ class Model:
     _current_generation = 0
     _duplication_replace_attempts = _default_duplication_replace_attempts
     _verbose = False
+    _early_stop = None
+    _mutate_elitists = False
 
     def __init__(self, population, all_values, strength_function, offspring_function,
                  elitism_ratio=0.1, mutation_odds=0.001, generations=10,
-                 duplication_policy='ignore', seed=int(time.time()), verbose=False):
+                 early_stop=None, mutate_elitists=False, duplication_policy='ignore',
+                 seed=int(time.time()), verbose=False):
         self._all_values = all_values
         self._initial_population = population
         self.set_strength_function(strength_function)
@@ -37,11 +40,22 @@ class Model:
         self.set_duplication_policy(duplication_policy)
         self.set_seed(seed)
         self.set_verbosity(verbose)
+        self.set_early_stop(early_stop)
+        self.set_elitists_mutation(mutate_elitists)
         self._set_population(population)
 
     def set_strength_function(self, strength_function): self._strength_function = strength_function
     def set_offspring_function(self, offspring_function): self._offspring_function = offspring_function
     def set_verbosity(self, verbose): self._verbose = verbose
+    def set_elitists_mutation(self, mutate_elitists): self._mutate_elitists = mutate_elitists
+
+    def set_early_stop(self, patience):
+        if patience is not None:
+            if patience == 0:
+                patience = None
+            elif patience < 0:
+                raise ValueError("Early stop patience must be a positive integer or None")
+        self._early_stop = patience
 
     def set_duplication_policy(self, duplication_policy):
         dp = duplication_policy.lower()
@@ -85,21 +99,9 @@ class Model:
         else:
             raise ValueError("All subjects in the population must have the same size")
 
-    def get_strength_function(self): return self._strength_function
-    def get_elitism_ratio(self): return self._elitism_ratio
-    def get_mutation_odds(self): return self._mutations_odds
-    def get_generations(self): return self._generations
-    def get_seed(self): return self._seed
-    def get_elements(self): return self._elements
     def get_population(self): return list(map(lambda el: el.get_genes(), self._elements))
-    def get_offspring_function(self): return self._offspring_function
     def get_end_reason(self): return self._end_reason
     def get_current_generation(self): return self._current_generation
-    def get_duplication_policy(self):
-        if self._duplication_policy == 'replace':
-            return 'replace:{}'.format(self._duplication_replace_attempts)
-        else:
-            return self._duplication_policy
 
     def _kill_misfits(self): self._elements = [el for el in self._elements if el.get_strength() > 0.0]
 
@@ -167,9 +169,12 @@ class Model:
         return elements
 
     def evolve(self):
+        highest_strength = 0
+        last_round_updated_highest_strength = 0
         self._end_reason = self._default_end_reason
         for g in range(0,self._generations+1):
-            self._print('Evolving - current generation: {0}, population size: {1}'.format(g,len(self._elements)))
+            self._print('Evolving - starting generation: {0}, population size: {1}, best solution so far: {2}'
+                        .format(g, len(self._elements), self.get_best()))
             self._current_generation = g
             if g > 0:
                 el_num = len(self._elements)
@@ -180,19 +185,32 @@ class Model:
                 elitism_num = round(self._elitism_ratio * el_num)
                 elitists = self._elements[0:elitism_num]
                 remaining_couples_num = math.floor((el_num-elitism_num)/2)
-                self._elements = elitists + self._breed(remaining_couples_num)
+                new_born = self._breed(remaining_couples_num)
+                if self._mutate_elitists:
+                    self._elements = elitists + new_born
+                    for el in self._elements:
+                        el.mutate(self._mutations_odds, self._all_values)
+                else:
+                    for el in new_born:
+                        el.mutate(self._mutations_odds,self._all_values)
+                    self._elements = elitists + new_born
                 self._handle_duplicates()
-                for el in self._elements:
-                    el.mutate(self._mutations_odds,self._all_values)
             for el in self._elements:
                 el.set_strength(self._strength_function)
             total_strength = sum([el.get_strength() for el in self._elements])
             for el in self._elements:
                 el.strength_to_probability(total_strength)
             self._elements.sort(reverse=True)
-            if any(math.isinf(el.get_strength()) for el in self._elements):
+            if math.isinf(self._elements[0].get_strength()):
                 self._end_reason = (1, 'Ideal solution found')
                 break
+            if self._elements[0].get_strength() > highest_strength:
+                highest_strength = self._elements[0].get_strength()
+                last_round_updated_highest_strength = g
+            if self._early_stop is not None:
+                if g - last_round_updated_highest_strength >= self._early_stop:
+                    self._end_reason = (3, 'Early stop')
+                    break
         if self._end_reason == self._default_end_reason:
             self._end_reason = (0, 'Evolution completed')
         self._print('Evolution stopped: cause: {0} [reason ID: {1}]'
