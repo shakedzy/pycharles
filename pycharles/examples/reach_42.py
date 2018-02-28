@@ -92,9 +92,24 @@ class NumericStringParser:
 
 
 def reach_42():
+    """
+    In this example, the population is made out of 30 combinations of simple mathematical equations. Each
+    equation is constructed of four integers from 0 to 9, separated by one of four mathematical operators:
+    [+,-,/,*]. The goal of the model is to construct such mathematical equation which will yield 42.
+    """
     calculator = NumericStringParser()
 
     def strength(subject, calculator):
+        """
+        This is the strength function which will be supplied to the model. The strength is calculated as
+        abs(1/(42-x)) for any given x.
+        calculator is an instance of NumericStringParser which is used to compute the mathematical result
+        out of a string of numbers and operators.
+
+        :param subject: the subject to evaluate
+        :param calculator: an instance of NumericStringParser
+        :return: calculated strength
+        """
         try:
             result = calculator.eval(''.join(subject))
             if result == 42.0:
@@ -105,6 +120,12 @@ def reach_42():
             return 0.0
 
     def strength_func(calculator):
+        """
+        This function created a partial function of strength to be used by the model.
+
+        :param calculator: an instance of NumericStringParser
+        :return: a partial function of strength
+        """
         return partial(strength, calculator=calculator)
 
     def calc(subject, calculator):
@@ -140,7 +161,7 @@ def reach_42():
                 r = random.randint(10, 13)
             subject.append(all_values[r])
         population.append(subject)
-    print('>> Values are a list')
+    print('>> Values are a list:\n',all_values)
     run_model(population,all_values,seed)
 
     # values are a dict
@@ -150,9 +171,9 @@ def reach_42():
                   2: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
                   4: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
                   6: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-                  1: [ "+", "-", "*", "/"],
-                  3: [ "+", "-", "*", "/"],
-                  5: [ "+", "-", "*", "/"]}
+                  1: ["+", "-", "*", "/"],
+                  3: ["+", "-", "*", "/"],
+                  5: ["+", "-", "*", "/"]}
     population = list()
     for _ in range(0,30):
         subject = list()
@@ -163,5 +184,9 @@ def reach_42():
                 r = random.randint(0,3)
             subject.append(all_values[i][r])
         population.append(subject)
-    print('>> Values are a dict')
+    print('>> Values are a dict:')
+    positions = list(all_values.keys())
+    positions.sort()
+    for p in positions:
+        print(p,':',all_values[p])
     run_model(population,all_values,seed)

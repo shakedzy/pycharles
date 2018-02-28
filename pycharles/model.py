@@ -7,6 +7,9 @@ from pycharles.element import Element
 
 
 class Model:
+    """
+    A Genetic Model.
+    """
     _default_end_reason = (-1, None)
     _default_duplication_replace_attempts = 3
 
@@ -31,6 +34,36 @@ class Model:
                  elitism_ratio=0.1, mutation_odds=0.001, generations=10,
                  early_stop=None, mutate_elitists=False, duplication_policy='ignore',
                  seed=int(time.time()), verbose=False):
+        """
+        Model's constructor
+
+        :param population: a sequence of subjects (sometimes refer to as Chromosomes in Genetic Model's terminology),
+                           where each subject is a sequence of genes
+        :param all_values: list or dict. a sequence of all values a subject in the population can have
+        :param strength_function: a function that maps a subject in the population to a non-negative number from 0 to
+                                  inf, which represents its strength, and therefore it probability to survive and
+                                  reproduce. The higher the number, the stronger the subject is
+        :param offspring_function: string or a function of (subject1, subject2) => (new_subject1, new_subject2).
+                                   a reproduction function that maps two subjects to two new subjects. This is the
+                                   definition of the reproduction mechanism works, and how to create the offspring of
+                                   two subjects in the population
+        :param elitism_ratio: a continuous number in the range [0,1], representing the percentage of elitists in each
+                              generation. Elitists are the strongest subject in their generation, and therefore survive
+                              and advance untouched to the next generation
+        :param mutation_odds: a continuous number in the range [0,1], which determines the probability for mutation of
+                              the subjects in each generation. A mutation is a single binary bit in the subject's genes
+                              being randomly flipped (subjects are transformed to binary representation behind the
+                              scenes)
+        :param generations: a non-negative integer, which determines the number of iterations the model will do
+        :param early_stop: None or a positive integer. When not None, The model
+                           will stop if a better solution was not found after the amount of generations specified
+        :param mutate_elitists: Boolean. Set if elitists can mutate when transferring from one generation to
+                                the next one
+        :param duplication_policy: string. The policy of the model regarding duplicates in the population at the end of
+                                   each generation. See README file for more details.
+        :param seed: a seed to be supplied to the model's pseudo-random number generator
+        :param verbose: Boolean. Set verbosity level
+        """
         self._all_values = all_values
         self._initial_population = population
         self.set_strength_function(strength_function)
@@ -114,13 +147,27 @@ class Model:
     def get_end_reason(self): return self._end_reason
     def get_current_generation(self): return self._current_generation
 
-    def _kill_misfits(self): self._elements = [el for el in self._elements if el.get_strength() > 0.0]
+    def _kill_misfits(self):
+        """
+        his function removes all Elements of the population with strength 0, as they have no chance of
+        reproduce or survive
+        """
+        self._elements = [el for el in self._elements if el.get_strength() > 0.0]
 
     def _print(self, text):
         if self._verbose:
             print(text)
 
     def _select_element(self, ignore_this_element=None):
+        """
+        This function randomly selects a single Element of a population based on their strength.
+        An ordered population is preferred for performance, where the first Element of the population has
+        the highest probability of survival and reproduction, and the rest are ordered by a decreasing
+        order of their strength (and survival probability).
+
+        :param ignore_this_element: if defined, this Element will not participate in the random selection
+        :return: a random Element of the population
+        """
         if ignore_this_element is None:
             p = 0.0
         else:
@@ -140,17 +187,29 @@ class Model:
         return selected
 
     def reset(self):
+        """
+        Reset the population to the initial population
+        """
         self._set_population(self._initial_population)
         self._end_reason = self._default_end_reason
         self._current_generation = 0
 
     def get_best(self,n=1):
+        """
+        Returns the n strongest subject in the population
+
+        :param n: how may subjects to return
+        :return: if n==1, return a single subject. if n>1, return a list of subjects, with decreasing strength.
+        """
         if n == 1:
             return self._elements[0].get_genes()
         else:
             [el.get_genes() for el in self._elements[0:n]]
 
     def _handle_duplicates(self):
+        """
+        This function applies the duplication policy onto the population.
+        """
         if self._duplication_policy == 'kill':
             self._elements = list(set(self._elements))
         elif self._duplication_policy == 'replace':
@@ -170,6 +229,13 @@ class Model:
             pass
 
     def _breed(self, number_of_couples):
+        """
+        This function is responsible for creating a pair of new Elements based on the number of pairs
+        requested. The model's offspringFunction is used for the creation of new Elements.
+
+        :param number_of_couples: the number of pairs of new Elements to create
+        :return: a sequence of the new Elements created
+        """
         elements = list()
         for _ in range(0,number_of_couples):
             father = self._select_element()
@@ -180,6 +246,11 @@ class Model:
         return elements
 
     def evolve(self):
+        """
+        The model's main procedure. This starts the evolution of the subjects of the population
+        for the specified amount of generations. This includes reproduction, elitists survival
+        and mutation.
+        """
         highest_strength = 0
         last_round_updated_highest_strength = 0
         self._end_reason = self._default_end_reason
