@@ -95,8 +95,5 @@ operators from `[+,-,*,/]`. Each subject is represented as sequence of single-ch
 a digit or an operator. The model's objective is to find a set of digits and characters which will
 yield 42. The Strength Function is defined as the absolute value of the result of 1/(x-42).
 
-### TO DO:
-* Code documentation
-
 ### License:
 Apache License 2.0
