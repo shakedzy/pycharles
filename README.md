@@ -37,11 +37,13 @@ pools for each index.
 * `strength_function`: A function that accepts a subject of the population and determines 
  its strength, in the range of [0, inf], the higher the strength is, the closer the subject is to the 
  desired state
-* `offspring_function`: A function that accepts two subjects (parents) 
- and outputs two subjects (offspring). The `offspring_functions` module holds some that can be used 
- (use `from pycharles import offspring_functions`)
 
 More configurations:
+* `offspring_function`: Can be either a string or a function that accepts two subjects (parents) 
+ and outputs two subjects (offspring). If a string, must be either 'slice_and_stitch' or 'parents_similarity'.
+ This will use the functions with the same name which are found in the `offspring_functions` module (see below).  
+ If the supplied value is a function, It must be af unctions that accepts only two subjects and returns a tuple of
+ two subjects. Default: 'slice_and_stitch'
 * `elitism_ratio`: Must be in the range of [0,1]. Determines the percentage of elitists in each 
  iteration. Elitists are the strongest subject in their generation, and therefore survive and advance 
  untouched to the next generation. Default value: 0.1
@@ -65,6 +67,24 @@ More configurations:
 * `seed`: A seed to be supplied to the model's pseudo-random number generator. Default value:
  system time (`int(time.time())`)
 * `verbose`: Boolean. Set verbosity level. Default: False
+
+### Offspring functions:
+The `offspring_functions` module contains two basics offspring functions which create two new subjects out of
+two existing subjects. Both functions use the `all_values` parameter required by the model to convert the 
+subjects to binary encoding. They then apply some logic on the binary sequence, and then decode it back to the
+newly created subjects.  
+
+Each function also has an extension with the `_func` prefix, which takes only `all_values` parameter 
+and return a partial function of the function itself. These extensions are the ones used by the model.
+
+* `slice_and_stitch`: This function chooses a location along the binary sequences, slices both sequences at that
+ location and replaces the second halves. For example, if the two subjects are `000000` and `111111` are being 
+ slices in the middle, the result will ve `000111` and `111000`. 
+* `parents_similarity`: This function creates two new subjects by comparing the bits of the binary sequences of the
+ provided subjects (the parents). If both parents have the same bit in a certain location, the offspring have a very 
+ high probability of having the same bit too in that location. If the parents' bits are opposite, than the offspring's 
+ bits are chosen randomly. For example, say the parents are s1 = `11000` and s2 = `11101`, then with high probability
+ the offspring will be s1_new = `11100` and s2_new = `11001` (the middle and last digit are randomly chosen)
  
 ## Examples:
 Examples are found in the project's test directory, in the `examples` module.

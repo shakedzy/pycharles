@@ -1,6 +1,7 @@
 import time
 import math
 import random
+from pycharles import offspring_functions
 from pycharles import random_util
 from pycharles.element import Element
 
@@ -26,7 +27,7 @@ class Model:
     _early_stop = None
     _mutate_elitists = False
 
-    def __init__(self, population, all_values, strength_function, offspring_function,
+    def __init__(self, population, all_values, strength_function, offspring_function='slice_and_stitch',
                  elitism_ratio=0.1, mutation_odds=0.001, generations=10,
                  early_stop=None, mutate_elitists=False, duplication_policy='ignore',
                  seed=int(time.time()), verbose=False):
@@ -45,9 +46,19 @@ class Model:
         self._set_population(population)
 
     def set_strength_function(self, strength_function): self._strength_function = strength_function
-    def set_offspring_function(self, offspring_function): self._offspring_function = offspring_function
     def set_verbosity(self, verbose): self._verbose = verbose
     def set_elitists_mutation(self, mutate_elitists): self._mutate_elitists = mutate_elitists
+
+    def set_offspring_function(self, offspring_function):
+        if isinstance(offspring_function, str):
+            if offspring_function == 'slice_and_stitch':
+                self._offspring_function = offspring_functions.slice_and_stitch_func(self._all_values)
+            elif offspring_function == 'parents_similarity':
+                self._offspring_function = offspring_functions.parents_similarity_func(self._all_values)
+            else:
+                raise ValueError('Unknown offspring function {0}'.format(offspring_function))
+        else:
+            self._offspring_function = offspring_function
 
     def set_early_stop(self, patience):
         if patience is not None:
@@ -184,8 +195,8 @@ class Model:
                     break
                 elitism_num = round(self._elitism_ratio * el_num)
                 elitists = self._elements[0:elitism_num]
-                remaining_couples_num = math.floor((el_num-elitism_num)/2)
-                new_born = self._breed(remaining_couples_num)
+                remaining_couples_num = round((el_num-elitism_num)/2)
+                new_born = self._breed(remaining_couples_num)[0:el_num-elitism_num]
                 if self._mutate_elitists:
                     self._elements = elitists + new_born
                     for el in self._elements:

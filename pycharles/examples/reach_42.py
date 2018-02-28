@@ -118,8 +118,7 @@ def reach_42():
         for subject in population:
             print(' '.join(subject), " = ", calc(subject, calculator))
         model = Model(population, all_values, strength_func(calculator),
-                      offspring_functions.slice_and_stitch_func(all_values),
-                      generations=15, seed=seed, verbose=True)
+                      seed=seed, verbose=True)
         print('----------------------------------')
         model.evolve()
         print('----------------------------------')
@@ -145,7 +144,7 @@ def reach_42():
     run_model(population,all_values,seed)
 
     # values are a dict
-    seed = 1519568341
+    seed = 1519568346
     random.seed(seed)
     all_values = {0: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
                   2: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
