@@ -9,7 +9,8 @@ _Charles Darwin, 1809-1882_
 
 ### Some reading and examples:
 * [Genetic Algorithms on Wikipedia](https://en.wikipedia.org/wiki/Genetic_algorithm)
-* This [blog post](https://burakkanber.com/blog/machine-learning-genetic-algorithms-part-1-javascript/) with a simple tutorial and an example
+* [This blog post](https://burakkanber.com/blog/machine-learning-genetic-algorithms-part-1-javascript/) with a simple tutorial and an example
+* [This video](https://www.mathworks.com/videos/what-is-a-genetic-algorithm-100904.html) by MathWorks
 
 ## Installation:
 Clone this repository to your local machine anr run `pip`:
