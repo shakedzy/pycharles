@@ -17,7 +17,7 @@ Clone this repository to your local machine anr run `pip`:
 ```
 git clone https://github.com/shakedzy/pycharles.git
 cd pycharles
-pip install .
+pip install -e .
 ```
 
 ## Usage:
