@@ -13,7 +13,7 @@ _Charles Darwin, 1809-1882_
 * [This video](https://www.mathworks.com/videos/what-is-a-genetic-algorithm-100904.html) by MathWorks
 
 ## Installation:
-Clone this repository to your local machine anr run `pip`:
+Clone this repository to your local machine and run `pip`:
 ```
 git clone https://github.com/shakedzy/pycharles.git
 cd pycharles
