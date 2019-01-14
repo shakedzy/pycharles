@@ -96,5 +96,10 @@ operators from `[+,-,*,/]`. Each subject is represented as sequence of single-ch
 a digit or an operator. The model's objective is to find a set of digits and characters which will
 yield 42. The Strength Function is defined as the absolute value of the result of 1/(x-42).
 
+---------------------
+
+### Related blogposts:
+Read about a comparison I performed between genetic models and random sampling using this library on "[Are Genetic Models Better Than Random Sampling?](https://medium.com/@shakedzy/are-genetic-models-better-than-random-sampling-8c678002d392)"
+
 ### License:
 Apache License 2.0
