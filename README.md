@@ -15,9 +15,7 @@ _Charles Darwin, 1809-1882_
 ## Installation:
 Clone this repository to your local machine and run `pip`:
 ```
-git clone https://github.com/shakedzy/pycharles.git
-cd pycharles
-pip install .
+pip install git+https://github.com/shakedzy/pycharles.git
 ```
 
 ## Usage:
